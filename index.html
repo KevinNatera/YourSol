@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Sol Map</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fix: Use Import Map to resolve bare module specifiers like 'three' -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <!-- 
+        NOTE FOR VITE/VS CODE: 
+        Firebase configuration is now loaded securely via import.meta.env
+        (from a .env file) in main.js. The mock global variables are removed.
+    -->
+  </head>
+  <body>
+    <div id="app-container">
+      <!-- Sidebar -->
+      <div id="sidebar" class="p-4 space-y-4">
+        <h1 class="text-3xl font-extrabold text-white">Your Sol</h1>
+        <div id="user-info" class="text-sm text-gray-400">
+          User ID:
+          <span
+            id="user-id-display"
+            class="font-mono text-xs bg-gray-700 px-2 py-1 rounded"
+            >Loading...</span
+          >
+        </div>
+
+        <!-- Generate New Topic -->
+        <div class="space-y-2 pt-2 border-t border-gray-700">
+          <input
+            type="text"
+            id="topic-input"
+            placeholder="Enter a new knowledge topic..."
+            class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-purple-500 focus:border-purple-500 text-sm"
+          />
+          <button
+            id="generate-btn"
+            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md disabled:bg-gray-500"
+            disabled
+          >
+            Generate Star System
+          </button>
+          <div
+            id="loading-indicator"
+            class="hidden justify-center items-center p-2 space-x-2"
+          >
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+
+        <!-- Star List and Search -->
+        <input
+          type="text"
+          id="star-search"
+          placeholder="Search stars..."
+          class="w-full p-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-blue-500 focus:border-blue-500 text-sm"
+        />
+
+        <div id="star-list-container">
+          <h2
+            class="text-lg font-semibold text-gray-300 mb-2 border-b border-gray-700 pb-1"
+          >
+            Your Systems
+          </h2>
+          <ul id="star-list" class="space-y-1">
+            <!-- Star list items will be injected here -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div id="main-content">
+        <!-- 3D Canvas Container -->
+        <div id="canvas-container" class="relative">
+          <!-- Canvas is initialized here by Three.js -->
+        </div>
+
+        <!-- Info Panel -->
+        <div id="info-panel" class="p-6 bg-gray-800 border-t border-gray-700">
+          <!-- === WRAPPER FOR THE LEFT COLUMN === -->
+          <div id="info-details">
+            <h2 id="info-title" class="text-xl font-bold mb-1 text-yellow-400 mt-0">
+              Select a Celestial Body
+            </h2>
+            <p id="info-description" class="text-gray-300 text-sm">
+              Click on a star, planet, or moon in the 3D space, or select a
+              system from the sidebar to view its details here.
+            </p>
+            <button
+              id="delete-star-btn"
+              class="hidden bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded mt-2 text-sm transition-colors duration-150"
+            >
+              Delete Star System
+            </button>
+          </div>
+          <!-- ==================================== -->
+
+          <!-- This is your navigator, now the second column -->
+          <div
+            id="system-navigator"
+            class="hidden mt-4 pt-4 border-t border-gray-700"
+          >
+            <h3
+              id="navigator-star-name"
+              class="text-lg font-bold text-yellow-400 mb-2 border-b border-gray-600 pb-1 mt-0"
+            ></h3>
+            <ul
+              id="navigator-celestial-list"
+              class="space-y-1 max-h-60 overflow-y-auto"
+            >
+              <!-- Planet and moon list will be dynamically generated here -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tooltip for Hover Effect -->
+    <div
+      id="tooltip"
+      class="absolute hidden bg-gray-900 text-white text-xs px-2 py-1 rounded-md shadow-lg pointer-events-none z-50 transition-opacity duration-100 opacity-0"
+    ></div>
+
+    <!-- Link to the external JavaScript file (must be type="module") -->
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,155 @@
+/* Global Reset and Typography */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #0d0d18;
+  color: #e0e0f0;
+  overflow: hidden; /* Hide body scrollbars */
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout */
+#app-container {
+  display: flex;
+  height: 100vh;
+  max-height: 100vh;
+}
+#sidebar {
+  width: 300px;
+  min-width: 300px;
+  background-color: #1a1a2e;
+  overflow-y: auto;
+  border-right: 1px solid #2c2c44;
+  display: flex;
+  flex-direction: column;
+}
+#main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+#canvas-container {
+  flex-grow: 1;
+  min-height: 50%;
+  background: #000000; /* Ensure black background for bloom effect */
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#star-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+
+/* Loading indicator styling */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #7b68ee;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.dot:nth-child(2) {
+  animation-delay: 0.5s;
+}
+.dot:nth-child(3) {
+  animation-delay: 1s;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- System Navigator --- */
+
+/* Style for each clickable item in the navigator list */
+.navigator-item {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  font-size: 0.875rem; /* 14px */
+}
+
+/* Hover effect for all items */
+.navigator-item:hover {
+  background-color: #4a5568; /* gray-600 */
+}
+
+/* Specific styling for planets */
+.navigator-item.planet {
+  font-weight: bold;
+  color: #63b3ed; /* blue-400 */
+}
+
+/* Specific styling for moons */
+.navigator-item.moon {
+  color: #a0aec0; /* gray-400 */
+  padding-left: 24px; /* Indent moons under their parent planet */
+}
+
+/* Custom scrollbar for the list to match the theme */
+#navigator-celestial-list::-webkit-scrollbar {
+  width: 8px;
+}
+#navigator-celestial-list::-webkit-scrollbar-track {
+  background: #2d3748; /* gray-700 */
+}
+#navigator-celestial-list::-webkit-scrollbar-thumb {
+  background: #718096; /* gray-500 */
+  border-radius: 4px;
+}
+#navigator-celestial-list::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0; /* gray-400 */
+}
+
+#info-panel {
+  display: flex; /* Creates the side-by-side layout */
+  gap: 2rem; /* Space between the two columns */
+  align-items: flex-start; /* Aligns the tops of the columns */
+  height: 35vh;
+  min-height: 250px;
+}
+
+/* The left column (description) should be flexible and take up remaining space */
+#info-details {
+  flex: 1; /* Grow to fill available space */
+  height: 100%; /* Fill the parent panel's height */
+  display: flex; /* Use flexbox to arrange its own content */
+  flex-direction: column;
+  overflow-y: auto; /* This makes the LEFT column scrollable */
+}
+
+/* The right column (navigator) should have a fixed width */
+#system-navigator {
+  width: 280px; /* Give the navigator a consistent width */
+  flex-shrink: 0; /* Prevents the navigator from shrinking */
+  height: 100%; /* Fill the parent panel's height */
+  flex-direction: column;
+  position: relative; /* Allows us to move it without affecting layout */
+  bottom: 25px;
+}
+
+#info-description {
+  overflow-y: auto; /* Add a scrollbar if the text is too long */
+  /* Set a max-height. Adjust this value if needed. */
+  /* This allows space for the title and delete button. */
+  max-height: 25vh;
+}
+
+/* Target the list in the right column (the navigator) */
+/* We are just adjusting its max-height for consistency */
+#navigator-celestial-list {
+  max-height: 25vh; /* Match the height of the description for a balanced look */
+}
