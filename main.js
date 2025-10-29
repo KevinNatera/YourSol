@@ -24,15 +24,8 @@ import {
   deleteDoc,
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// --- BUILD FIREBASE CONFIG FROM .ENV VARIABLES ---
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_APP_ID,
-};
+// REFACTOR: Import the initialized Firebase services and the public appId from the new config file.
+import { db, auth, appId } from "./firebaseConfig.js";
 
 // --- GLOBAL VARIABLES & CONFIGURATION ---
 let camera, scene, renderer, controls, composer;
@@ -48,7 +41,6 @@ const mouseDownPosition = new THREE.Vector2();
 let starIdToFlash = null;
 let isInitialLoad = true;
 let selectedStarId = null;
-
 
 // Visual/Glow Constants
 const ENTIRE_SCENE = 0,
@@ -76,34 +68,23 @@ const navigatorList = document.getElementById("navigator-celestial-list");
 
 // --- FIREBASE INITIALIZATION & CONFIGURATION HANDLING ---
 
-/**
- * Safely retrieves Firebase configuration from global Canvas variables (or mocks them).
- */
-let app, db, auth;
-// The 'appId' is now taken directly from your new config object
-const appId = firebaseConfig.appId;
-// 'isDeployed' is now true ONLY if your .env variable was successfully loaded
-const isDeployed = !!firebaseConfig.apiKey;
+// REFACTOR: The logic for handling mock mode is preserved, but it now checks for the SECRET
+// Gemini key. This is a more reliable way to determine if the app is running in a "real"
+// environment with all secrets loaded.
+const isDeployed = !!import.meta.env.VITE_GEMINI_API_KEY;
 
 if (isDeployed) {
   // --- REAL/DEPLOYED MODE ---
-  // If .env variables were loaded, this block will run.
-  try {
-    app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-    auth = getAuth(app);
-    console.log("Firebase services initialized successfully.");
-    // Button is disabled until user auth is confirmed.
-    generateBtn.disabled = true;
-  } catch (error) {
-    console.error("Firebase initialization failed:", error);
-    userIdDisplay.textContent = "Config Error";
-    generateBtn.disabled = true;
-  }
+  // The Firebase services are already initialized by the import. We just need to handle the UI state.
+  console.log(
+    "Firebase services imported successfully. Running in deployed mode."
+  );
+  // Button is disabled until user auth is confirmed.
+  generateBtn.disabled = true;
 } else {
   // --- MOCK/LOCAL MODE ---
-  // If .env variables were missing, this block will run.
-  console.warn("Firebase .env variables not found. Running in MOCK mode.");
+  // If the secret Gemini key is missing, this block will run.
+  console.warn("VITE_GEMINI_API_KEY not found. Running in MOCK mode.");
   userIdDisplay.textContent = "Local Mock";
   // For local testing, enable the generate button immediately.
   generateBtn.disabled = false;
@@ -464,10 +445,6 @@ function createStarSystem(data, docId, position, shouldFlash = false) {
   }
 
   // Planets
-  // REFACTOR: Increased the initial orbit radius from 80 to 120.
-  // The maximum star radius is 2.0 * 24 = 48. This new value ensures
-  // the first planet's orbit is well clear of the star's surface,
-  // preventing collisions.
   let orbitRadius = 160;
   data.planets.forEach((planetData) => {
     // Group for the planet and its moons to handle rotation/orbit
@@ -580,7 +557,7 @@ function createStarSystem(data, docId, position, shouldFlash = false) {
 // --- NAVIGATION, INTERACTION, & AUTH ---
 
 async function handleAuthentication() {
-  if (!auth) {
+  if (!isDeployed) {
     userId = crypto.randomUUID();
     userIdDisplay.textContent = `${userId.substring(0, 8)} (Mock)`;
     renderInitialMockGalaxy();
@@ -1027,7 +1004,7 @@ async function handleGenerateStar() {
 
   console.log("Checking conditions:", { db, userId, isDeployed });
 
-  if (db && userId && isDeployed) {
+  if (isDeployed) {
     // 1. Attempt to call the Gemini API
     generatedData = await _geminiApiExecutor(topic);
 
@@ -1156,7 +1133,6 @@ async function handleDeleteStar() {
     console.log(
       "Star system deleted successfully. onSnapshot will now update the UI."
     );
-
   } catch (error) {
     console.error("Error deleting star system:", error);
     alert("There was an error deleting the star system. Please try again.");
@@ -1170,7 +1146,7 @@ async function handleDeleteStar() {
 function populateSystemNavigator(docId) {
   const starSystem = celestialObjects.get(docId);
 
-  // --- REFACTOR: Retrieve the FULL data from the systemGroup ---
+  // --- Retrieve the FULL data from the systemGroup ---
   const fullStarData = starSystem.systemGroup.userData.fullData;
 
   // Check if we have valid data before proceeding
@@ -1186,7 +1162,6 @@ function populateSystemNavigator(docId) {
 
   // 2. Loop through planets to build the list
   fullStarData.planets.forEach((planetData) => {
-    // <-- Now this will work
     // --- Create Planet Element ---
     const planetLi = document.createElement("li");
     const planetSpan = document.createElement("span");
